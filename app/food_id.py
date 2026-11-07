@@ -1,12 +1,16 @@
 """Identifies visible dishes with a local classifier trained on Food-101."""
 
 import io
+import os
 from pathlib import Path
 
+import certifi
 from PIL import Image
 import torch
 from torch import nn
 from torchvision.models import EfficientNet_V2_S_Weights, efficientnet_v2_s
+
+os.environ.setdefault("SSL_CERT_FILE", certifi.where())  # Lets Python download the base model.
 
 MODEL_PATH = Path(__file__).resolve().parent.parent / "models" / "food101_head.pt"
 MIN_CONFIDENCE = 0.6  # Hints below this are dropped. Packaging usually lands here.

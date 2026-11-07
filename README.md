@@ -71,11 +71,13 @@ The order is kept in memory, so scan it again after restarting the app.
 
 Before the demo, remove each item from the tray one at a time and confirm the screen catches it.
 
-## Food-101 food identification (not trained yet)
+## Food-101 food identification
 
-`app/food_id.py` can give Claude extra dish suggestions from a local classifier trained on [Food-101](https://huggingface.co/datasets/ethz/food101). No trained model is included, and the app runs on Claude alone until `models/food101_head.pt` exists.
+`app/food_id.py` runs a local classifier trained on all 75,750 [Food-101](https://huggingface.co/datasets/ethz/food101) training photos. It adds dish suggestions to each tray scan, and Claude makes the final decision. Suggestions below 60% confidence are dropped.
 
-To train it, which downloads about 5 GB:
+It scored 77.8% top-1 and 94.4% top-5 on the 25,250 held-out test photos. It knows only 101 dishes, and it was trained on plated food, so it can't identify food inside closed packaging.
+
+To retrain it, which downloads about 5 GB:
 
 ```bash
 SSL_CERT_FILE=$(.venv/bin/python -c 'import certifi; print(certifi.where())') .venv/bin/python -m training.train_food101 --cache-dir ./food101-data
