@@ -1,0 +1,11 @@
+httpx
+fastapi
+uvicorn
+python-dotenv
+pydantic
+pytest
+qrcode
+torch
+torchvision
+pillow
+datasets
