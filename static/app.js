@@ -6,6 +6,7 @@ const TIMER_WARN_SECONDS = 120;
 const TIMER_LATE_SECONDS = 240;
 
 const DISPLAY_REFRESH_MS = 1000;
+const MAX_PIPS = 6; // Larger quantities show the count only.
 const displayOnly = new URLSearchParams(location.search).has("display");
 
 const el = (id) => document.getElementById(id);
@@ -67,7 +68,18 @@ function render(state) {
     }
     const count = document.createElement("span");
     count.className = "count";
-    count.textContent = `${line.have} of ${line.qty}`;
+    if (line.qty <= MAX_PIPS) {
+      const pips = document.createElement("span");
+      pips.className = "pips";
+      pips.setAttribute("aria-hidden", "true");
+      for (let i = 0; i < line.qty; i += 1) {
+        const pip = document.createElement("i");
+        if (i < line.have) pip.className = "on";
+        pips.append(pip);
+      }
+      count.append(pips);
+    }
+    count.append(`${line.have} of ${line.qty}`);
     row.append(name, count);
     list.append(row);
   }
@@ -250,6 +262,8 @@ el("camera-select").onchange = (event) => {
 el("scan-toggle").onclick = (event) => {
   scanning = !scanning;
   event.target.textContent = scanning ? "Pause scanning" : "Resume scanning";
+  document.body.classList.toggle("paused", !scanning);
+  document.querySelector(".live-chip b").textContent = scanning ? "Scanning" : "Paused";
   setScanNote(scanning ? "" : "Scanning paused.");
 };
 
