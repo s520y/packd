@@ -4,3 +4,8 @@ __pycache__/
 .pytest_cache/
 food101-data/
 .DS_Store
+.taste-skill/
+shots/
+node_modules/
+.claude/
+skills-lock.json

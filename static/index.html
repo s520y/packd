@@ -3,13 +3,32 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="description" content="Check a packing tray against the order with a phone camera.">
   <title>Tray Check</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400..800&display=swap">
   <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
   <p id="test-banner" class="test-banner" role="status" hidden>Test mode: scans are fake and don't read your receipt or tray.</p>
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="mark" aria-hidden="true"></span>
+      <span class="wordmark">Tray Check</span>
+    </div>
+    <div class="actions">
+      <button id="scan-receipt" class="primary" type="button">Scan receipt</button>
+      <button id="type-order" type="button">Type order</button>
+      <button id="reset" type="button">New tray</button>
+      <input id="receipt-file" type="file" accept="image/*" hidden>
+    </div>
+  </header>
+
   <main>
-    <section class="camera">
+    <section class="camera" aria-label="Tray camera">
       <div class="video-frame">
         <video id="video" autoplay playsinline muted></video>
         <p id="camera-note" class="video-note">Choose a camera to start.</p>
@@ -17,22 +36,21 @@
       <div class="controls">
         <label>Camera <select id="camera-select"></select></label>
         <button id="scan-toggle" type="button">Pause scanning</button>
-        <button id="scan-receipt" type="button">Scan receipt</button>
-        <button id="type-order" type="button">Type order</button>
-        <button id="reset" type="button">New tray</button>
-        <input id="receipt-file" type="file" accept="image/*" hidden>
       </div>
-      <p id="scan-note" class="scan-note" role="status"></p>
     </section>
 
-    <section class="panel">
+    <section class="panel" aria-label="Tray status">
       <div id="status" class="status status-no_order" role="status" aria-live="polite">
         <span id="status-title">Scan a receipt to start</span>
         <span id="status-detail"></span>
       </div>
-      <div class="timer-row">
+      <p id="scan-note" class="scan-note" role="status"></p>
+      <div class="order-row">
         <span id="order-name"></span>
-        <span id="timer" class="timer">0:00</span>
+        <span class="timer-group">
+          <span class="timer-label">Open for</span>
+          <span id="timer" class="timer">0:00</span>
+        </span>
       </div>
       <ul id="checklist"></ul>
       <div id="mock-panel" class="mock" hidden>
@@ -43,6 +61,7 @@
       </div>
     </section>
   </main>
+
   <dialog id="review" aria-labelledby="review-title">
     <form id="review-form" method="dialog">
       <h2 id="review-title">Check the order</h2>
