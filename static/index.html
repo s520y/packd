@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#ffffff">
   <meta name="description" content="Check a packing tray against the order with a phone camera.">
-  <title>Tray Check</title>
+  <title>Pack'd</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400..800&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Plus+Jakarta+Sans:wght@400..800&display=swap">
   <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
@@ -17,7 +17,7 @@
   <header class="topbar">
     <div class="brand">
       <span class="mark" aria-hidden="true"></span>
-      <span class="wordmark">Tray Check</span>
+      <span class="wordmark">Pack'd</span>
     </div>
     <div class="actions">
       <button id="scan-receipt" class="primary" type="button">Scan receipt</button>
@@ -29,8 +29,25 @@
 
   <main>
     <section class="camera" aria-label="Tray camera">
-      <div class="video-frame">
+      <div id="video-frame" class="video-frame">
         <video id="video" autoplay playsinline muted></video>
+        <div class="hud" aria-hidden="true">
+          <span class="hud-grid"></span>
+          <span class="hud-corner top-left"></span>
+          <span class="hud-corner top-right"></span>
+          <span class="hud-corner bottom-left"></span>
+          <span class="hud-corner bottom-right"></span>
+          <span class="hud-reticle"></span>
+          <span class="hud-sweep"></span>
+          <div class="hud-row hud-top">
+            <span id="hud-state" class="hud-chip">Standby</span>
+            <span id="hud-count" class="hud-chip">Scan 0000</span>
+          </div>
+          <div class="hud-row hud-bottom">
+            <span id="hud-latency" class="hud-chip">Latency --</span>
+            <span id="hud-size" class="hud-chip">-- x --</span>
+          </div>
+        </div>
         <p id="camera-note" class="video-note">Choose a camera to start.</p>
       </div>
       <div class="controls">
@@ -51,6 +68,10 @@
           <span class="timer-label">Open for</span>
           <span id="timer" class="timer">0:00</span>
         </span>
+      </div>
+      <div class="progress" aria-hidden="true">
+        <div id="progress-bar" class="progress-bar"></div>
+        <span id="progress-text" class="progress-text">0 / 0 items</span>
       </div>
       <ul id="checklist"></ul>
       <div id="mock-panel" class="mock" hidden>

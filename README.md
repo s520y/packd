@@ -1,4 +1,4 @@
-# Tray Check
+# Pack'd
 
 Scan a receipt or DoorDash ticket to load the order. A phone camera then watches the packing tray, and every few seconds Claude checks it against the order. The screen shows what's missing, how long the tray has been open, and whether it's complete.
 

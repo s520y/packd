@@ -19,6 +19,7 @@ let mockOrderKey = null; // Rebuilds the test panel when the order changes.
 let hasOrder = false;
 let reviewing = false; // Pauses tray scans while an order is being read or checked.
 let timerBase = null; // { seconds, receivedAt }
+let scansDone = 0;
 let scanNumber = 0; // A scan that started before "New tray" must not update the screen.
 
 function missingText(lines) {
@@ -82,6 +83,7 @@ function render(state) {
     ? null
     : { seconds: state.elapsed_seconds, receivedAt: performance.now() };
   renderTimer();
+  renderProgress(state.lines);
 
   const orderKey = state.lines.map((line) => line.item).join("\n");
   if (mockMode && orderKey !== mockOrderKey) {
@@ -115,8 +117,27 @@ function setScanNote(message, isError = false) {
   note.classList.toggle("error", isError);
 }
 
+function setHud(label, active = false) {
+  el("hud-state").textContent = label;
+  el("hud-state").classList.toggle("live", active);
+  el("video-frame").classList.toggle("scanning", active);
+}
+
+function renderProgress(lines) {
+  const total = lines.reduce((sum, line) => sum + line.qty, 0);
+  const have = lines.reduce((sum, line) => sum + Math.min(line.have, line.qty), 0);
+  const bar = el("progress-bar");
+  if (bar.children.length !== total) {
+    bar.replaceChildren(...Array.from({ length: total }, () => document.createElement("span")));
+  }
+  [...bar.children].forEach((segment, index) => segment.classList.toggle("on", index < have));
+  el("progress-text").textContent = `${have} / ${total} items`;
+}
+
 async function scanOnce() {
-  if (!hasOrder || reviewing) return;
+  if (!scanning) return setHud("Paused");
+  if (reviewing) return setHud("Reading order");
+  if (!hasOrder) return setHud("Standby");
   const frame = await captureFrame();
   if (!frame && !mockMode) {
     setScanNote("Waiting for the camera.");
@@ -124,6 +145,7 @@ async function scanOnce() {
   }
   const thisScan = ++scanNumber;
   const started = performance.now();
+  setHud("Scanning", true);
   try {
     const response = await fetch("/api/scan", {
       method: "POST",
@@ -135,11 +157,17 @@ async function scanOnce() {
     if (thisScan !== scanNumber) return;
     render(body);
     const seconds = ((performance.now() - started) / 1000).toFixed(1);
+    scansDone += 1;
+    el("hud-count").textContent = `Scan ${String(scansDone).padStart(4, "0")}`;
+    el("hud-latency").textContent = `Latency ${seconds}s`;
+    el("hud-size").textContent = `${canvas.width} x ${canvas.height}`;
+    setHud(body.scan_skipped ? "Hand detected" : "Tracking");
     const dishes = Object.keys(body.food_hints ?? {}).join(", ");
     setScanNote(body.scan_skipped
       ? "Hand over tray, waiting for it to clear."
       : `Last scan took ${seconds}s.${dishes ? ` Food ID: ${dishes}.` : ""}`);
   } catch (error) {
+    setHud("Signal lost");
     setScanNote(`${error.message} Trying again.`, true);
   }
 }
@@ -147,7 +175,7 @@ async function scanOnce() {
 async function scanLoop() {
   while (true) {
     const started = performance.now();
-    if (scanning) await scanOnce();
+    await scanOnce();
     const elapsed = performance.now() - started;
     await new Promise((resolve) =>
       setTimeout(resolve, Math.max(250, MIN_SECONDS_BETWEEN_SCANS * 1000 - elapsed)));

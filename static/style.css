@@ -15,7 +15,7 @@
   --amber: #8a5300;
   --ochre: #ffc043;
   --sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
-  --mono: var(--sans);
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
   --radius: 14px;
   --pill: 999px;
   --shadow: 0 1px 2px rgb(0 0 0 / 6%), 0 6px 20px rgb(0 0 0 / 6%);
@@ -131,6 +131,107 @@ video { display: block; width: 100%; height: 100%; object-fit: cover; }
 .controls label { display: flex; align-items: center; gap: 8px; min-width: 0; color: var(--muted); font-size: 16px; }
 .controls select { width: min(280px, 52vw); }
 
+/* Scanner overlay. It's decoration, so nothing here can catch taps. */
+
+.hud { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+
+.hud-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgb(255 255 255 / 30%) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(255 255 255 / 30%) 1px, transparent 1px),
+    linear-gradient(rgb(255 255 255 / 11%) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(255 255 255 / 11%) 1px, transparent 1px);
+  background-size: 33.333% 33.333%, 33.333% 33.333%, 8.333% 8.333%, 6.25% 6.25%;
+  background-position: -1px -1px;
+}
+
+.hud-corner {
+  position: absolute;
+  width: 34px;
+  height: 34px;
+  border: 0 solid #fff;
+  filter: drop-shadow(0 0 2px rgb(0 0 0 / 60%));
+}
+
+.top-left { top: 14px; left: 14px; border-width: 3px 0 0 3px; border-top-left-radius: 8px; }
+.top-right { top: 14px; right: 14px; border-width: 3px 3px 0 0; border-top-right-radius: 8px; }
+.bottom-left { bottom: 14px; left: 14px; border-width: 0 0 3px 3px; border-bottom-left-radius: 8px; }
+.bottom-right { right: 14px; bottom: 14px; border-width: 0 3px 3px 0; border-bottom-right-radius: 8px; }
+
+.hud-reticle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 26px;
+  height: 26px;
+  transform: translate(-50%, -50%);
+  background:
+    linear-gradient(#fff, #fff) center / 100% 1px no-repeat,
+    linear-gradient(#fff, #fff) center / 1px 100% no-repeat;
+  opacity: 0.75;
+}
+
+.hud-sweep {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: #ff3b24;
+  box-shadow: 0 0 14px 3px rgb(255 59 36 / 60%);
+  opacity: 0;
+}
+
+.hud-row {
+  position: absolute;
+  left: 58px;
+  right: 58px;
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.hud-top { top: 16px; }
+.hud-bottom { bottom: 16px; }
+
+.hud-chip {
+  padding: 3px 8px;
+  color: #fff;
+  background: rgb(0 0 0 / 62%);
+  border-radius: 6px;
+  font: 500 13px/1.3 var(--mono);
+  white-space: nowrap;
+}
+
+.hud-chip.live::before {
+  content: "";
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 7px;
+  background: #ff3b24;
+  border-radius: 50%;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .scanning .hud-sweep { opacity: 1; animation: hud-sweep 1.5s linear infinite; }
+}
+
+@keyframes hud-sweep {
+  from { top: 0; }
+  to { top: 100%; }
+}
+
+/* Packing progress */
+
+.progress { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.progress-bar { display: flex; flex: 1; gap: 4px; }
+.progress-bar span { flex: 1; height: 8px; background: var(--line); border-radius: 2px; }
+.progress-bar span.on { background: var(--green); }
+.progress-text { flex: none; color: var(--muted); font: 500 14px/1 var(--mono); }
+
 /* Status: the one thing to read from across the kitchen */
 
 .status {
@@ -175,7 +276,7 @@ video { display: block; width: 100%; height: 100%; object-fit: cover; }
 
 .timer {
   color: var(--green-deep);
-  font: 800 36px/1.1 var(--mono);
+  font: 700 36px/1.1 var(--mono);
   font-variant-numeric: tabular-nums;
 }
 
@@ -219,7 +320,7 @@ li.done > span:first-of-type { color: var(--muted); }
 li.problem::before, li.wrong::before { border-color: var(--red); background: var(--red); }
 li.wrong { display: grid; color: var(--red); font-weight: 700; }
 
-.count { flex: none; color: var(--muted); font: 700 18px/1.4 var(--mono); font-variant-numeric: tabular-nums; }
+.count { flex: none; color: var(--muted); font: 500 16px/1.6 var(--mono); }
 li.done .count { color: var(--green-deep); }
 li.problem .count { color: var(--red); }
 
